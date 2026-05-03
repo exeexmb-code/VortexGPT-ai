@@ -1,0 +1,491 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VortexGPT</title>
+  <style>
+    :root {
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #1e3a8a;
+      --muted: #94a3b8;
+      --bubble-user: #083344;
+      --bubble-ai: #112233;
+    }
+    * { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: url('https://files.catbox.moe/0ai462.jpg') center/cover no-repeat fixed,
+              linear-gradient(180deg, #071024 0%, #071329 100%);
+  color: #e6eef8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  max-width: 820px;
+  margin: 20px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+h1 { font-size: 18px; margin: 0; }
+p.lead { margin: 0; color: var(--muted); font-size: 13px; }
+
+.chat-area {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+  height: 62vh;
+}
+
+.chat-container {
+  background: rgba(255,255,255,0.01);
+  padding: 18px;
+  border-radius: 10px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-message {
+  max-width: 78%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  line-height: 1.3;
+}
+
+.message-sender {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.message-content { white-space: pre-wrap; }
+
+.user-message {
+  align-self: flex-end;
+  background: linear-gradient(90deg,#052f3b,#083344);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+.ai-message {
+  align-self: flex-start;
+  background: linear-gradient(90deg,#0b2a52,#0b1f3a);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+.typing {
+  font-style: italic;
+  color: var(--muted);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.typing .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: 0.3;
+  animation: blink 1s infinite;
+}
+
+.typing .dot:nth-child(2) { animation-delay: .12s; }
+.typing .dot:nth-child(3) { animation-delay: .24s; }
+
+@keyframes blink {
+  0%,100% { opacity: .2; }
+  50% { opacity: 1; }
+}
+
+.composer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.02);
+  border-radius: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+textarea {
+  width: 100%;
+  min-height: 44px;
+  max-height: 120px;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  outline: none;
+  resize: none;
+  font-size: 14px;
+  padding: 6px;
+}
+
+.controls { display: flex; gap: 8px; }
+
+button {
+  background: var(--accent);
+  border: 0;
+  color: white;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:disabled { opacity: .5; cursor: not-allowed; }
+.btn-clear { background: #283444; color: #cfe6ff; }
+
+.meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.small { font-size: 12px; color: var(--muted); }
+
+/* 🎵 MUSIC PLAYER NEW ULTRA STYLE */
+.music-player {
+  width: 100%;
+  max-width: 820px;
+  padding: 18px;
+  border-radius: 16px;
+  backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  margin-bottom: 22px;
+}
+
+.music-title {
+  font-size: 15px;
+  margin-bottom: 6px;
+  color: #e8f1ff;
+}
+
+.controls-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.music-btn {
+  background: rgba(255,255,255,0.12);
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: .2s;
+  font-weight: 600;
+}
+
+.music-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.progress {
+  width: 100%;
+  height: 6px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.15);
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: #4d8cff;
+  transition: width 0.15s linear;
+}
+
+@media (max-width:520px){
+  .app { padding: 12px; }
+  .chat-area { height: 64vh; }
+}
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <img src="https://files.catbox.moe/nljkbl.jpg" class="logo" alt="Logo Nata">
+  <div>
+    <h1>VortexGPT</h1>
+    <p class="lead">AI ini di kembangkan oleh seseorang bernama nata, pengembangan AI ini dapat membantu seseorang menyelesaikan masalah dengan mudah :)</p>
+  </div>
+</header>
+
+<div class="chat-area">
+  <div id="chatContainer" class="chat-container" aria-live="polite"></div>
+
+  <div>
+    <div id="typingIndicator" class="typing" style="display:none;">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div style="margin-left:8px;color:var(--muted);font-size:13px">VortexGPT sedang mengetik...</div>
+    </div>
+
+    <div class="composer">
+      <div class="input">
+        <textarea id="chatInput" placeholder="Tulis pesan..."></textarea>
+      </div>
+      <div class="controls">
+        <button id="sendMessageBtn">Kirim</button>
+        <button id="clearBtn" class="btn-clear">Clear</button>
+      </div>
+    </div>
+
+    <div class="meta">
+      <div class="small">⚠️ Gunakan AI ini sebaik mungkin dan dengan bijak, dilarang menggukan untuk hal ilegal dan sensitif.</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+<!-- 🎵 MUSIC PLAYER (PREMIUM VERSION) -->
+<div class="music-player">
+  <div class="music-title" id="musicTitle">🎵 Memutar: Terbuang waktu - Barasuara</div>
+
+  <audio id="player">
+    <source id="audioSource" src="https://files.catbox.moe/olfjxk.m4a" type="audio/mpeg">
+  </audio>
+
+  <div class="progress">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="controls-row">
+    <div class="music-btn" id="prevBtn">⏮️ Prev</div>
+    <div class="music-btn" id="playPauseBtn">▶️ Play</div>
+    <div class="music-btn" id="nextBtn">⏭️ Next</div>
+  </div>
+</div>
+
+<script>
+/* === PLAYLIST === */
+const playlist = [
+  { title: "Terbuang waktu - Barasuara", url: "https://files.catbox.moe/olfjxk.m4a" },
+  { title: "AY - d'Bagindas", url: "https://files.catbox.moe/acdoig.mp3" },
+  { title: "Apa Kabar Kamu - Armada", url: "https://files.catbox.moe/l59rna.mp3" }
+];
+
+let index = 0;
+const player = document.getElementById("player");
+const audioSource = document.getElementById("audioSource");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const progressFill = document.getElementById("progressFill");
+const titleEl = document.getElementById("musicTitle");
+
+function loadTrack(i){
+  audioSource.src = playlist[i].url;
+  titleEl.textContent = "🎵 Memutar: " + playlist[i].title;
+  player.load();
+  player.play();
+  playPauseBtn.textContent = "⏸️ Pause";
+}
+
+playPauseBtn.addEventListener("click", () => {
+  if(player.paused){
+    player.play();
+    playPauseBtn.textContent = "⏸️ Pause";
+  } else {
+    player.pause();
+    playPauseBtn.textContent = "▶️ Play";
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  index = (index + 1) % playlist.length;
+  loadTrack(index);
+});
+
+prevBtn.addEventListener("click", () => {
+  index = (index - 1 + playlist.length) % playlist.length;
+  loadTrack(index);
+});
+
+player.addEventListener("timeupdate", () => {
+  const percent = (player.currentTime / player.duration) * 100;
+  progressFill.style.width = percent + "%";
+});
+
+player.addEventListener("ended", () => {
+  index = (index + 1) % playlist.length;
+  loadTrack(index);
+});
+
+/* === GEMINI SCRIPT (TIDAK DIUBAH) === */
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent";
+const GEMINI_API_KEY = "AIzaSyCnltgFTo4vqOE0KnY0GpyNzN2qQ5rg7Yc";
+
+const chatContainer = document.getElementById("chatContainer");
+const chatInput = document.getElementById("chatInput");
+const sendMessageBtn = document.getElementById("sendMessageBtn");
+const typingIndicator = document.getElementById("typingIndicator");
+const clearBtn = document.getElementById("clearBtn");
+
+sendMessageBtn.addEventListener("click", sendMessageToAI);
+clearBtn.addEventListener("click", () => { clearChat(); chatInput.focus(); });
+
+chatInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessageToAI();
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  clearChat();
+  chatInput.focus();
+});
+
+async function sendMessageToAI() {
+  const message = chatInput.value.trim();
+  if (!message) return;
+
+  addMessageToChat("user", message);
+  chatInput.value = "";
+  sendMessageBtn.disabled = true;
+  typingIndicator.style.display = "flex";
+
+  try {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: message }] }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 2048,
+        },
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || "Terjadi kesalahan.");
+
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respons.";
+    await addAIMessageWithEffect(aiResponse);
+
+  } catch (error) {
+    addMessageToChat("ai", `⚠️ Error: ${error.message}`);
+  } finally {
+    sendMessageBtn.disabled = false;
+    chatInput.focus();
+  }
+}
+
+function typeTextEffect(element, text, speed = 13) {
+  return new Promise((resolve) => {
+    let index = 0;
+    function type() {
+      if (index < text.length) {
+        element.textContent += text.charAt(index);
+        index++;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        setTimeout(type, speed);
+      } else resolve();
+    }
+    type();
+  });
+}
+
+async function addAIMessageWithEffect(text) {
+  typingIndicator.style.display = "none";
+
+  const messageDiv = document.createElement("div");
+  messageDiv.className = "chat-message ai-message";
+
+  const senderDiv = document.createElement("div");
+  senderDiv.className = "message-sender";
+  senderDiv.textContent = "VortexGPT";
+
+  const contentDiv = document.createElement("div");
+  contentDiv.className = "message-content";
+  contentDiv.textContent = "";
+
+  messageDiv.appendChild(senderDiv);
+  messageDiv.appendChild(contentDiv);
+  chatContainer.appendChild(messageDiv);
+
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  await typeTextEffect(contentDiv, text);
+}
+
+function addMessageToChat(sender, message) {
+  const messageDiv = document.createElement("div");
+  messageDiv.className = `chat-message ${sender}-message`;
+
+  const senderDiv = document.createElement("div");
+  senderDiv.className = "message-sender";
+  senderDiv.textContent = sender === "user" ? "Anda" : "VortexGPT";
+
+  const contentDiv = document.createElement("div");
+  contentDiv.className = "message-content";
+  contentDiv.textContent = message;
+
+  messageDiv.appendChild(senderDiv);
+  messageDiv.appendChild(contentDiv);
+  chatContainer.appendChild(messageDiv);
+
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function clearChat() {
+  chatContainer.innerHTML = `
+    <div class="chat-message ai-message">
+      <div class="message-sender">VortexGPT</div>
+      <div class="message-content">
+        Halo! Saya VortexGPT, topik apa yang akan kita bahas hari ini
+              Berikan pertanyaan atau pembahasan topik kepada ku 🫪
+      </div>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
